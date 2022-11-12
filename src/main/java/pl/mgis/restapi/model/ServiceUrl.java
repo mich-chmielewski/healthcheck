@@ -12,10 +12,10 @@ import java.util.List;
 public class ServiceUrl {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String urlAddress;
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private ResponseType responseType;
     private int hitIntervalInMinutes;
     @OneToMany(mappedBy = "serviceUrl", fetch = FetchType.LAZY,

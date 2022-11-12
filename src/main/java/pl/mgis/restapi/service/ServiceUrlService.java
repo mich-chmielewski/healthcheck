@@ -3,6 +3,7 @@ package pl.mgis.restapi.service;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import pl.mgis.restapi.dto.ServiceUrlDto;
 import pl.mgis.restapi.model.HitLog;
 import pl.mgis.restapi.model.ResponseType;
 import pl.mgis.restapi.model.ServiceUrl;
@@ -42,7 +43,7 @@ public class ServiceUrlService {
         serviceUrlList.forEach(
                 u->u.setHitLogs(
                         hitLogList.stream().
-                        filter(h->h.getServiceUrl().getId() == u.getId())
+                        filter(h->h.getServiceUrl().getId().equals(u.getId()))
                         .collect(Collectors.toList())
                 )
         );
@@ -54,13 +55,16 @@ public class ServiceUrlService {
     }
 
     //@Transactional
-    public ServiceUrl add(ServiceUrl serviceUrl){
-        ServiceUrl newServiceUrl =  urlRepository.save(serviceUrl);
-        newServiceUrl.setResponseType(ResponseType.XML);
-        return newServiceUrl;
+    public ServiceUrlDto add(ServiceUrlDto serviceUrlDto){
+        ServiceUrl serviceUrl = new ServiceUrl();
+        serviceUrl.setUrlAddress(serviceUrlDto.urlAddress());
+        serviceUrl.setHitIntervalInMinutes(serviceUrlDto.hitIntervalInMinutes());
+        serviceUrl.setResponseType(serviceUrlDto.responseType());
+        ServiceUrl saved = urlRepository.save(serviceUrl);
+        return new ServiceUrlDto(saved.getId(),saved.getUrlAddress(),saved.getResponseType(),saved.getHitIntervalInMinutes());
     }
 
-    public ServiceUrl addByHyber(ServiceUrl serviceUrl){
+    public ServiceUrl addByHyper(ServiceUrl serviceUrl){
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("pl.mgis.restapi");
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
