@@ -16,14 +16,15 @@ public class HitLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String responseStatus;
+    private int responseStatus;
     private String responseBody;
+    @Column(updatable = false)
+    @CreationTimestamp
+    private LocalDateTime created;
     @JsonIgnore
     @ManyToOne
     private ServiceUrl serviceUrl;
 
-    @Column(updatable = false)
-    @CreationTimestamp
-    private LocalDateTime created;
+
 
 }

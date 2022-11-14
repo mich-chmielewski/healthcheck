@@ -1,5 +1,5 @@
 package pl.mgis.restapi.model;
 
 public enum ResponseType {
-    JSON,XML,TEXT
+    JSON,XML,TEXT,NO_CHECK
 }

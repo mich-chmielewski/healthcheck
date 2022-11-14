@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import pl.mgis.restapi.model.ServiceUrl;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface ServiceUrlRepository extends JpaRepository<ServiceUrl, Long> {
@@ -22,10 +23,10 @@ public interface ServiceUrlRepository extends JpaRepository<ServiceUrl, Long> {
 
     @Query("select u from ServiceUrl u"
             + " left join fetch u.hitLogs")
-    List<ServiceUrl> findAllServiceUrl();
+    Set<ServiceUrl> findAllServiceUrl();
 
-
-    @Query("select u from ServiceUrl u")
+    @Query("select u from ServiceUrl u"
+            + " left join fetch u.hitLogs")
     List<ServiceUrl> findAllPaged(Pageable pageable);
 
 

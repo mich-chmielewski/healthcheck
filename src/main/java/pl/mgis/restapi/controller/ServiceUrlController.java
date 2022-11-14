@@ -9,6 +9,7 @@ import pl.mgis.restapi.model.ServiceUrl;
 import pl.mgis.restapi.service.ServiceUrlService;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 public class ServiceUrlController {
@@ -19,14 +20,15 @@ public class ServiceUrlController {
     }
 
     @GetMapping("/api/services")
-    public ResponseEntity<List<ServiceUrl>> listAll() {
+    public ResponseEntity<Set<ServiceUrlDto>> listAll() {
         return new ResponseEntity<>(serviceUrlService.getAll(), HttpStatus.OK);
     }
 
     @GetMapping("/api/services/paged")
-    public ResponseEntity<List<ServiceUrl>> listAllPaged(@RequestParam(value = "page", defaultValue = "0") String page, Sort.Direction sort) {
+    public ResponseEntity<List<ServiceUrlDto>> listAllPaged(@RequestParam(value = "page", defaultValue = "0") Integer page,
+                                                         @RequestParam(defaultValue = "ASC") Sort.Direction sort) {
 
-        return new ResponseEntity<>(serviceUrlService.getAllPaged(Integer.parseInt(page), sort), HttpStatus.OK);
+        return new ResponseEntity<>(serviceUrlService.getAllPaged(page, sort), HttpStatus.OK);
     }
 
     @GetMapping("/api/services/{urlPart}")
@@ -35,7 +37,21 @@ public class ServiceUrlController {
     }
 
     @PostMapping("/api/services")
-    public ResponseEntity<ServiceUrlDto> add(@RequestBody ServiceUrlDto serviceUrlDto) {
-        return new ResponseEntity<>(serviceUrlService.add(serviceUrlDto), HttpStatus.OK);
+    public ResponseEntity<ServiceUrlDto> addService(@RequestBody ServiceUrlDto serviceUrlDto) {
+       // return new ResponseEntity<>(serviceUrlService.addByHyper(serviceUrlDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(serviceUrlService.add(serviceUrlDto), HttpStatus.CREATED);
     }
+
+    @PutMapping("/api/services")
+    public ResponseEntity<ServiceUrlDto> editService(@RequestBody ServiceUrlDto serviceUrlDto) {
+        // return new ResponseEntity<>(serviceUrlService.addByHyper(serviceUrlDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(serviceUrlService.edit(serviceUrlDto), HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/api/services/{id}")
+    public void deleteServiceUrl(@PathVariable("id") Long id){
+        serviceUrlService.delete(id);
+    }
+
+
 }

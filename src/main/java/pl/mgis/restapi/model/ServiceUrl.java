@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -18,7 +18,7 @@ public class ServiceUrl {
     @Enumerated(EnumType.STRING)
     private ResponseType responseType;
     private int hitIntervalInMinutes;
-    @OneToMany(mappedBy = "serviceUrl", fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL, orphanRemoval = true)
-    List<HitLog> hitLogs;
+    @OneToMany(cascade = {CascadeType.REMOVE,CascadeType.DETACH})
+    @JoinColumn(name = "service_url_id", updatable = false,insertable = false)
+    Set<HitLog> hitLogs;
 }
