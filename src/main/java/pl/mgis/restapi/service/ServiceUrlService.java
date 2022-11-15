@@ -1,5 +1,7 @@
 package pl.mgis.restapi.service;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -32,12 +34,16 @@ public class ServiceUrlService {
         this.em = em;
     }
 
+    @Cacheable("findAllForScheduler")
+    public List<ServiceUrl> findAll() {
+        return urlRepository.findAll();
+    }
 
     public Set<ServiceUrlDto> getAll() {
 
         return urlRepository.findAllServiceUrl()
                 .stream().map(u -> new ServiceUrlDto(u.getId(), u.getUrlAddress()
-                        , u.getResponseType(), u.getHitIntervalInMinutes(),
+                        , u.getResponseType(), u.getRequestSchedule(),
                         u.getHitLogs().stream().map(Mapper::hitLogToDto).collect(Collectors.toSet())))
                 .collect(Collectors.toSet());
     }
@@ -55,7 +61,7 @@ public class ServiceUrlService {
         );
         return serviceUrlList.stream()
                 .map(u -> new ServiceUrlDto(u.getId(), u.getUrlAddress(), u.getResponseType()
-                        , u.getHitIntervalInMinutes(), u.getHitLogs().stream()
+                        , u.getRequestSchedule(), u.getHitLogs().stream()
                         .map(Mapper::hitLogToDto).collect(Collectors.toSet())))
                 .collect(Collectors.toList());
     }
@@ -64,20 +70,22 @@ public class ServiceUrlService {
         return urlRepository.findAllUrlsContainingString(urlPart);
     }
 
+    @CacheEvict(cacheNames = {"findAllForScheduler"})
     public ServiceUrlDto add(ServiceUrlDto serviceUrlDto) {
         ServiceUrl serviceUrl = new ServiceUrl();
         serviceUrl.setUrlAddress(serviceUrlDto.urlAddress());
-        serviceUrl.setHitIntervalInMinutes(serviceUrlDto.hitIntervalInMinutes());
+        serviceUrl.setRequestSchedule(serviceUrlDto.requestSchedule());
         serviceUrl.setResponseType(serviceUrlDto.responseType());
         ServiceUrl saved = urlRepository.save(serviceUrl);
         return Mapper.serviceUrlToDto(saved);
     }
 
     @Transactional
+    @CacheEvict(cacheNames = {"findAllForScheduler"})
     public ServiceUrlDto edit(ServiceUrlDto serviceUrlDto) {
         ServiceUrl serviceUrl = urlRepository.findById(serviceUrlDto.id()).orElseThrow(null);
         serviceUrl.setUrlAddress(serviceUrlDto.urlAddress());
-        serviceUrl.setHitIntervalInMinutes(serviceUrlDto.hitIntervalInMinutes());
+        serviceUrl.setRequestSchedule(serviceUrlDto.requestSchedule());
         serviceUrl.setResponseType(serviceUrlDto.responseType());
         return Mapper.serviceUrlToDto(serviceUrl);
     }
@@ -86,13 +94,15 @@ public class ServiceUrlService {
     public ServiceUrlDto addByHyper(ServiceUrlDto serviceUrlDto) {
         ServiceUrl serviceUrl = new ServiceUrl();
         serviceUrl.setUrlAddress(serviceUrlDto.urlAddress());
-        serviceUrl.setHitIntervalInMinutes(serviceUrlDto.hitIntervalInMinutes());
+        serviceUrl.setRequestSchedule(serviceUrlDto.requestSchedule());
         serviceUrl.setResponseType(serviceUrlDto.responseType());
         em.persist(serviceUrl);
         em.flush();
-        return new ServiceUrlDto(serviceUrl.getId(), serviceUrl.getUrlAddress(), serviceUrl.getResponseType(), serviceUrl.getHitIntervalInMinutes(), new HashSet<>());
+        return new ServiceUrlDto(serviceUrl.getId(), serviceUrl.getUrlAddress(), serviceUrl.getResponseType(),
+                serviceUrl.getRequestSchedule(), new HashSet<>());
     }
 
+    @CacheEvict(cacheNames = {"findAllForScheduler"})
     public void delete(Long id) {
         urlRepository.deleteById(id);
     }

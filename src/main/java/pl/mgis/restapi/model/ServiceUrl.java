@@ -17,7 +17,8 @@ public class ServiceUrl {
     private String urlAddress;
     @Enumerated(EnumType.STRING)
     private ResponseType responseType;
-    private int hitIntervalInMinutes;
+    @Enumerated(EnumType.STRING)
+    private RequestSchedule requestSchedule;
     @OneToMany(cascade = {CascadeType.REMOVE,CascadeType.DETACH})
     @JoinColumn(name = "service_url_id", updatable = false,insertable = false)
     Set<HitLog> hitLogs;

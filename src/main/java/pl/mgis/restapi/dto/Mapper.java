@@ -13,7 +13,7 @@ public class Mapper {
     }
     public static ServiceUrlDto serviceUrlToDto(ServiceUrl serviceUrl){
         return new ServiceUrlDto(serviceUrl.getId(),serviceUrl.getUrlAddress(),
-                serviceUrl.getResponseType(), serviceUrl.getHitIntervalInMinutes(),
+                serviceUrl.getResponseType(), serviceUrl.getRequestSchedule(),
                 serviceUrl.getHitLogs().stream().map(Mapper::hitLogToDto).collect(Collectors.toSet()));
     }
 }
