@@ -1,0 +1,517 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://thymeleaf.org">
+<main id="replacedMain" th:fragment="main-empty">
+</main>
+<main id="replacedMain" th:fragment="main-dashboard">
+    <div class="container-fluid px-4">
+        <div class="card-header">
+            <i class="fas fa-tachometer-alt me-1"></i>
+            Panel główny
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-chart-bar me-1"></i>
+                        Zgłoszenia o typie
+                    </div>
+                    <div class="card-body"><canvas id="typeBarChart" width="100%" height="50"></canvas></div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-chart-bar me-1"></i>
+                        Zgłoszenia o statusie
+                    </div>
+                    <div class="card-body"><canvas id="statusBarChart" width="100%" height="50"></canvas></div>
+                </div>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-map me-1"></i>
+                Mapa zgłoszeń
+            </div>
+            <div class="card-body" style="height:600px;padding:0">
+                <iframe src="../map/map.html" allowfullscreen style="height:100%;width:100%"></iframe>
+            </div>
+        </div>
+    </div>
+</main>
+
+<main th:fragment="main-reportTypes">
+    <div class="modal fade" id="reportTypeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Typ Zgłoszenia</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="reportTypeForm">
+                        <input type="hidden" name="id" id="id">
+                        <input type="hidden" id="operation" name="operation" value="post">
+                        <div class="form-group">
+                            <label for="active" class="col-form-label">Aktywne:</label>
+                            <select class="form-select" name="active" id="active">
+                                <option value="true">Tak</option>
+                                <option value="false">Nie</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="description" class="col-form-label">Opis:</label>
+                            <input type="text" class="form-control" name="description" id="description">
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="col-form-label">Email:</label>
+                            <input type="text" class="form-control" id="email" name="email">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <button type="button" onclick="sendReportTypeForm();" class="btn btn-primary">Zapisz</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid px-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
+                Typ zgłoszenia
+                <button type="button" onclick="reportTypeModal();" class="btn btn-primary btn-sm btn-add" data-toggle="modal"><i
+                        class="fas fa-plus-square"></i> Dodaj
+                </button>
+            </div>
+            <div class="card-body">
+                <table id="simpleTable" class="display cell-border">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>Aktywne</th>
+                        <th>Opis</th>
+                        <th>Email</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="reportType: ${reportTypes}">
+                        <td><a href="#" th:attr="onclick=${'getReportType('+reportType.id+')'}"
+                               class="btn btn-outline-primary btn-sm" role="button"><i
+                                class="fas fa-pencil-alt"></i></a> <a href="#"
+                                                                      th:attr="onclick=${'deleteReportType('+reportType.id+')'}"
+                                                                      class="btn btn-outline-primary btn-sm"
+                                                                      role="button"><i class="far fa-trash-alt"></i></a>
+                        </td>
+                        <td><p th:text="${reportType.active}" th:data-status="${reportType.active}"></td>
+                        <td th:text="${reportType.description}"></td>
+                        <td th:text="${reportType.email}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<main th:fragment="main-reportStatus">
+    <div class="modal fade" id="reportStatusModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Status zgłoszenia</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="reportStatusForm">
+                        <input type="hidden" name="id" id="id">
+                        <input type="hidden" id="operation" name="operation" value="post">
+                        <div class="form-group">
+                            <label for="statusCode" class="col-form-label">Kod statusu:</label>
+                            <input type="text" class="form-control" name="statusCode" id="statusCode">
+                        </div>
+                        <div class="form-group">
+                            <label for="description" class="col-form-label">Opis:</label>
+                            <input type="text" class="form-control" name="description" id="description">
+                        </div>
+                        <div class="form-group">
+                            <label for="color" class="col-form-label">Kolor:</label>
+                            <input type="color" class="form-control form-control-color" id="color" name="color">
+                        </div>
+                        <div class="form-group">
+                            <label for="stage" class="col-form-label">Etap:</label>
+                            <select class="form-select" name="stage" id="stage">
+                                <option th:each="stage : ${T(pl.mgis.problemreport.model.Stage).values()}"
+                                        th:value="${stage}" th:text="${stage}"></option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <button type="button" onclick="sendReportStatusForm();" class="btn btn-primary">Zapisz</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid px-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
+                Status raportu
+                <button type="button" onclick="reportStatusModal();" class="btn btn-primary btn-sm btn-add" data-toggle="modal">
+                    <i class="fas fa-plus-square"></i> Dodaj
+                </button>
+            </div>
+            <div class="card-body">
+                <table id="simpleTable" class="display cell-border">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>Kod statusu</th>
+                        <th>Opis</th>
+                        <th>Kolor</th>
+                        <th>Etap</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="status: ${reportStatus}">
+                        <td><a href="#" th:attr="onclick=${'getReportStatus('+status.id+')'}"
+                               class="btn btn-outline-primary btn-sm" role="button"><i
+                                class="fas fa-pencil-alt"></i></a> <a href="#"
+                                                                      th:attr="onclick=${'deleteReportStatus('+status.id+')'}"
+                                                                      class="btn btn-outline-primary btn-sm"
+                                                                      role="button"><i class="far fa-trash-alt"></i></a>
+                        </td>
+                        <td th:text="${status.statusCode}"></td>
+                        <td th:text="${status.description}"></td>
+                        <td th:style="${'color:white; background-color:' + status.color +';'}"
+                            th:text="${status.color}"></td>
+                        <td><p th:text="${status.stage}" th:data-status="${status.stage}"></p></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<main th:fragment="main-users">
+    <div class="modal fade" id="userModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Użytkownik</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="userForm">
+                        <div class="form-group">
+                            <input type="hidden" name="id" id="id">
+                            <input type="hidden" id="operation" name="operation" value="post">
+                            <label for="username" class="col-form-label">Login:</label>
+                            <input type="text" class="form-control" name="username" id="username">
+                        </div>
+                        <div class="form-group">
+                            <label for="password" class="col-form-label">Password:</label>
+                            <input type="text" class="form-control" name="password" id="password">
+                        </div>
+                        <div class="form-group">
+                            <label for="userRole" class="col-form-label">Rola:</label>
+                            <select class="form-select" name="userRole" id="userRole">
+                                <option th:each="role : ${T(pl.mgis.problemreport.model.UserRole).values()}"
+                                        th:value="${role}" th:text="${role}"></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="col-form-label">Email:</label>
+                            <input type="text" class="form-control" id="email" name="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="enabled" class="col-form-label">Aktywny:</label>
+                            <select class="form-select" name="enabled" id="enabled">
+                                <option value="true">Tak</option>
+                                <option value="false">Nie</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <button type="button" onclick="sendUserForm();" class="btn btn-primary">Zapisz</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid px-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
+                Użytkownicy
+                <button type="button" onclick="userModal();" class="btn btn-primary btn-sm btn-add" data-toggle="modal"><i
+                        class="fas fa-plus-square"></i> Dodaj
+                </button>
+            </div>
+            <div class="card-body">
+                <table id="simpleTable" class="display cell-border">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>Login</th>
+                        <th>Email</th>
+                        <th>Rola</th>
+                        <th>Aktywny</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="user: ${users}">
+                        <td><a href="#" th:attr="onclick=${'getUser('+user.id+')'}"
+                               class="btn btn-outline-primary btn-sm" role="button"><i class="fas fa-user-edit"></i></a>
+                            <a href="#" th:attr="onclick=${'deleteUser('+user.id+')'}"
+                               class="btn btn-outline-primary btn-sm" role="button"><i class="far fa-trash-alt"></i></a>
+                        </td>
+                        <td th:text="${user.username}"></td>
+                        <td th:text="${user.email}"></td>
+                        <td th:text="${user.userRole}"></td>
+                        <td><p th:text="${user.enabled}" th:data-status="${user.enabled}"></p></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<main th:fragment="main-reports">
+    <div class="modal fade bd-example-modal-lg" id="reportModal" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Zgłoszenie</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="reportForm">
+                        <input type="hidden" name="id" id="id">
+                        <input type="hidden" id="operation" name="operation" value="post">
+                        <div class="form-group">
+                            <label for="statusCode" class="col-form-label">Status:</label>
+                            <select class="form-select" name="statusCode" id="statusCode">
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade bd-example-modal-lg" id="commentModal" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Komentarz</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="commentForm">
+                        <input type="hidden" name="reportId" id="reportId">
+                        <input type="hidden" name="id" id="id">
+                        <input type="hidden" id="operation" name="operation" value="post">
+                        <div class="form-group">
+                            <textarea rows="5" name="content" id="content" class="form-control"
+                                      form="commentForm"></textarea>
+                        </div>
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input type="checkbox" name="sendByEmail" class="form-check-input" value="false">Wyślij
+                                wiadomość email do zgłoszającego
+                            </label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <button type="button" onclick="sendCommentForm();" class="btn btn-primary">Zapisz</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade bd-example-modal-lg" id="commentsModal" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" style="width: 90%;" role="document">
+            <div class="modal-content">
+                <div id="commentsHeader" class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Komentarz </h5>
+                    <button style="margin-left:20px;" id="addComment" type="button" data-reportId=""
+                            onclick="showAddComment(this.dataset.reportId);" class="btn btn-primary"
+                            data-toggle="modal"><i class="fas fa-plus-square"></i> Dodaj
+                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table id="commentsTable" class="table table-bordered" style="width:100%;font-size: 0.875rem;">
+                        <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Data</th>
+                            <th>Komentarz</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="mapModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-xl" style="width: 90%;" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Lokalizacja</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="height: 90vh;">
+                    <iframe id="mapIframe" src="about:blank" style="overflow:hidden;height:100%;width:100%"
+                            height="100%" width="100%">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid px-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
+                Zgłoszenia
+            </div>
+            <div class="card-body">
+                <table id="reportTable" class="display cell-border" style="width:100%;font-size: 0.875rem;">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>Id</th>
+                        <th>Status</th>
+                        <th>Typ</th>
+                        <th>Opis</th>
+                        <th>Zdjęcie</th>
+                        <th>Email</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<main th:fragment="main-settings-mail">
+    <div class="container-fluid px-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
+                Konfiguracja Email
+                <button type="submit" class="btn btn-primary btn-sm btn-add" form="formSetting">Zapisz</button>
+            </div>
+            <div class="card-body">
+                <form id="formSetting" th:object="${mailSettingsForm}" action="#" th:action="@{/manager/mail/save}"
+                      th:method="post">
+                    <table id="simpleTable" class="display cell-border">
+                        <thead>
+                        <tr>
+                            <th>Ustawienie</th>
+                            <th>Wartość</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="settingObjDTO, itemStat : ${mailSettingsForm.settingObjDTOS}">
+                            <td th:text="${settingObjDTO.displayName}"></td>
+                            <td th:if="${!settingObjDTO.key.contains('boolean')}">
+                                <input type="hidden" th:name="|settingObjDTOS[${itemStat.index}].displayName|"
+                                       th:value="${settingObjDTO.getDisplayName}" class="form-control"/>
+                                <input type="hidden" th:name="|settingObjDTOS[${itemStat.index}].key|"
+                                       th:value="${settingObjDTO.getKey()}" class="form-control"/>
+                                <input type="text" th:name="|settingObjDTOS[${itemStat.index}].value|"
+                                       th:value="${settingObjDTO.getValue()}" class="form-control"/>
+                            </td>
+                            <td th:if="${settingObjDTO.key.contains('boolean')}">
+                                <input type="hidden" th:name="|settingObjDTOS[${itemStat.index}].displayName|"
+                                       th:value="${settingObjDTO.getDisplayName}" class="form-control"/>
+                                <input type="hidden" th:name="|settingObjDTOS[${itemStat.index}].key|"
+                                       th:value="${settingObjDTO.getKey()}" class="form-control"/>
+                                <select class="form-select" th:name="|settingObjDTOS[${itemStat.index}].value|">
+                                    <option value="true" th:selected="${settingObjDTO.value} == 'true'">Tak</option>
+                                    <option value="false" th:selected="${settingObjDTO.value} == 'false'">Nie</option>
+                                </select>
+                            </td>
+                        </tr>
+                        </tbody>
+
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<main th:fragment="main-settings-company">
+    <div class="container-fluid px-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
+                Konfiguracja Jednostki
+                <button type="submit" class="btn btn-primary btn-sm btn-add" form="formSetting">Zapisz</button>
+            </div>
+            <div class="card-body">
+                <h1 th:if="${info}">
+                    <p th:text="${info}"/>
+                </h1>
+                <form id="formSetting" modelAttribute="settingsForm" action="#" th:action="@{/manager/company/save}"
+                      th:object="${settingsForm}" th:method="post" enctype="multipart/form-data">
+                    <table id="simpleTable" class="display cell-border">
+                        <thead>
+                        <tr>
+                            <th>Ustawienie</th>
+                            <th>Wartość</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="setting : ${settingsForm.settings.entrySet()}">
+                            <td th:text="${setting.key}"></td>
+                            <td th:if="${setting.key.contains('file')}"><p>
+                                <input style="display:unset;width:50%" type="text" th:field="*{settings['__${setting.key}__']}" class="form-control"
+                                       disabled readonly/>
+                                <input style="display:unset;width:40%" th:if="${setting.key.contains('file')}" type="file" th:name="${setting.key}"
+                                       class="form-control"/>
+                            </p> </td>
+<!--                            <td th:if="${setting.key.contains('file')}">
+                                <input th:if="${setting.key.contains('file')}" type="file" th:name="${setting.key}"
+                                       class="form-control"/>
+                            </td>-->
+                            <td th:if="${!setting.key.contains('file') AND !setting.key.contains('rodo')}">
+                                <input type="text" th:field="*{settings['__${setting.key}__']}" class="form-control"/>
+                            </td>
+                            <td th:if="${!setting.key.contains('file') AND setting.key.contains('rodo')}">
+                                <textarea rows="5" th:field="*{settings['__${setting.key}__']}"
+                                          class="form-control"></textarea>
+                            </td>
+                        </tr>
+                        </tbody>
+
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
