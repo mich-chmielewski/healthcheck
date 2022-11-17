@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import pl.mgis.healthcheck.Mailer.MailerService;
 import pl.mgis.healthcheck.model.HitLog;
 import pl.mgis.healthcheck.model.RequestSchedule;
 import pl.mgis.healthcheck.model.ResponseType;
@@ -27,10 +28,14 @@ public class ScheduledTasks {
     private static final Logger logger = LoggerFactory.getLogger(ScheduledTasks.class);
     private final ServiceUrlService serviceUrlService;
     private final HitLogService hitLogService;
+    private final MailerService mailerService;
+    private final EmailService emailService;
 
-    public ScheduledTasks(ServiceUrlService serviceUrlService, HitLogService hitLogService) {
+    public ScheduledTasks(ServiceUrlService serviceUrlService, HitLogService hitLogService, MailerService mailerService, EmailService emailService) {
         this.serviceUrlService = serviceUrlService;
         this.hitLogService = hitLogService;
+        this.mailerService = mailerService;
+        this.emailService = emailService;
     }
 
     @Scheduled(fixedRate = 15, timeUnit = TimeUnit.MINUTES)
@@ -61,7 +66,7 @@ public class ScheduledTasks {
                 .readTimeout(5, TimeUnit.SECONDS)
                 .build();
         for (ServiceUrl s : serviceUrlList) {
-            try (Response response = okClient.newCall(getOkRequest(s)).execute()){
+            try (Response response = okClient.newCall(getOkRequest(s)).execute()) {
                 if (response.code() >= 400) {
                     logger.info("{} {}- {} Service UP but with ERRORS {}", currentThread().getName(),
                             s.getRequestSchedule(), LocalDateTime.now(), s.getUrlAddress());
@@ -71,7 +76,7 @@ public class ScheduledTasks {
                 }
                 logger.info("{} Service UP {}", LocalDateTime.now(), s.getUrlAddress());
                 if (!s.getResponseType().equals(ResponseType.ONLY_STATUS))
-                    logger.info("BODY: {}", String.format("%.200s...",response.peekBody(200).string()));
+                    logger.info("BODY: {}", String.format("%.200s...", response.peekBody(200).string()));
             } catch (IOException | NullPointerException e) {
                 logger.info("{} {}- {} Service DOWN {}", currentThread().getName(), s.getRequestSchedule(),
                         LocalDateTime.now(), s.getUrlAddress());
@@ -85,6 +90,7 @@ public class ScheduledTasks {
                         .build();
                 createHitLog(s, response);
             }
+            sendEmailNotifications(s.getId());
         }
     }
 
@@ -93,7 +99,7 @@ public class ScheduledTasks {
         hitLog.setCreated(LocalDateTime.now());
         hitLog.setResponseStatus(response.code());
         try {
-            hitLog.setResponseBody(String.format("%.200s...",response.peekBody(200).string()));
+            hitLog.setResponseBody(String.format("%.200s...", response.peekBody(200).string()));
         } catch (IOException e) {
             hitLog.setResponseBody(e.getMessage());
         }
@@ -115,5 +121,15 @@ public class ScheduledTasks {
                 .url(s.getUrlAddress())
                 .get()
                 .build();
+    }
+
+    private void sendEmailNotifications(long emailServiceId) {
+        List<HitLog> todayHitLog = hitLogService.findHitLogLessThenFour()
+                .stream().filter(h -> h.getServiceUrl().getId() == emailServiceId).collect(Collectors.toList());
+        for (HitLog h : todayHitLog) {
+            String subject = h.getResponseStatus() == 503 ? "Service DOWN " : "Service PROBLEM ";
+            mailerService.sendSimpleMessage(emailService.getEmailSetting(),
+                    subject + h.getServiceUrl().getUrlAddress(), h.toString());
+        }
     }
 }

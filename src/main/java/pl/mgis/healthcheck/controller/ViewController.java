@@ -32,10 +32,10 @@ public class ViewController {
     void disableFavicon() {
     }
 
-    @GetMapping({"/","/{page}"})
+/*    @GetMapping({"/","/{page}"})
     public String start(@PathVariable(value = "page",required = false) String page) {
         return "redirect:/view/dashboard";
-    }
+    }*/
 
     @GetMapping("/authorize")
     public @ResponseBody boolean isUserLoggedIn() {

@@ -20,4 +20,7 @@ public interface HitLogRepository extends JpaRepository<HitLog, Long> {
             "ON H.SERVICE_URL_ID = B.SERVICE_URL_ID " +
             "WHERE B.HIT_NUMBER < 4", nativeQuery = true)
     List<HitLog> findHitLogsFromPresentDayLessThenFour();
+
+    @Query(value = "SELECT H.* FROM HIT_LOG H WHERE FORMATDATETIME(CREATED,'yyyy-MM-dd ') = CURRENT_DATE()", nativeQuery = true)
+    List<HitLog> findHitLogFromPresentDay();
 }
