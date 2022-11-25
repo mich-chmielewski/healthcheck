@@ -6,18 +6,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pl.mgis.healthcheck.Mailer.MailerService;
+import pl.mgis.healthcheck.dto.HitLogDto;
+import pl.mgis.healthcheck.dto.Mapper;
 import pl.mgis.healthcheck.model.HitLog;
 import pl.mgis.healthcheck.model.RequestSchedule;
-import pl.mgis.healthcheck.model.ResponseType;
 import pl.mgis.healthcheck.model.ServiceUrl;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -43,55 +42,72 @@ public class ScheduledTasks {
         scheduleTasksCronFromDb(RequestSchedule.EVERY_15_MIN);
     }
 
-    @Scheduled(initialDelay = 1, fixedRate = 60, timeUnit = TimeUnit.MINUTES)
+    @Scheduled(initialDelay = 2, fixedRate = 60, timeUnit = TimeUnit.MINUTES)
     public void runEveryOneHour() {
         scheduleTasksCronFromDb(RequestSchedule.EVERY_1_HOUR);
     }
 
-    @Scheduled(initialDelay = 2, fixedRate = 12 * 60, timeUnit = TimeUnit.MINUTES)
+    @Scheduled(initialDelay = 4, fixedRate = 12 * 60, timeUnit = TimeUnit.MINUTES)
+    public void runEverySixHour() {
+        scheduleTasksCronFromDb(RequestSchedule.EVERY_6_HOUR);
+    }
+
+    @Scheduled(initialDelay = 6, fixedRate = 12 * 60, timeUnit = TimeUnit.MINUTES)
     public void runEveryTwelveHour() {
         scheduleTasksCronFromDb(RequestSchedule.EVERY_12_HOUR);
     }
 
-    @Scheduled(initialDelay = 3, fixedRate = 24 * 60, timeUnit = TimeUnit.MINUTES)
-    public void runEveryDay() {
-        scheduleTasksCronFromDb(RequestSchedule.EVERY_DAY);
+    @Scheduled(initialDelay = 8, fixedRate = 24 * 60, timeUnit = TimeUnit.MINUTES)
+    public void runEveryTwentyFourHour() {
+        scheduleTasksCronFromDb(RequestSchedule.EVERY_24_HOUR);
     }
 
     public void scheduleTasksCronFromDb(RequestSchedule requestSchedule) {
         logger.info("Schedule {} executed at {}", requestSchedule, LocalDateTime.now());
+
         List<ServiceUrl> serviceUrlList = serviceUrlService.findAll().stream().
                 filter(u -> u.getRequestSchedule().equals(requestSchedule)).collect(Collectors.toList());
+
         OkHttpClient okClient = new OkHttpClient.Builder()
-                .readTimeout(5, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
                 .build();
+
         for (ServiceUrl s : serviceUrlList) {
+
             try (Response response = okClient.newCall(getOkRequest(s)).execute()) {
+                //TODO check response mimetype
                 if (response.code() >= 400) {
-                    logger.info("{} {}- {} Service UP but with ERRORS {}", currentThread().getName(),
-                            s.getRequestSchedule(), LocalDateTime.now(), s.getUrlAddress());
-                    logger.info("BODY {}", response.peekBody(200).string());
-                    createHitLog(s, response);
+                    createProblemHitLog(s, response);
                     continue;
                 }
-                logger.info("{} Service UP {}", LocalDateTime.now(), s.getUrlAddress());
-                if (!s.getResponseType().equals(ResponseType.ONLY_STATUS))
-                    logger.info("BODY: {}", String.format("%.200s...", response.peekBody(200).string()));
+                long time = response.receivedResponseAtMillis() - response.sentRequestAtMillis();
+                logger.info("{} Service UP {} ResponseTime {} millis", LocalDateTime.now(), s.getUrlAddress(),time);
+                //TODO create notice HitLog about slow response time
             } catch (IOException | NullPointerException e) {
-                logger.info("{} {}- {} Service DOWN {}", currentThread().getName(), s.getRequestSchedule(),
-                        LocalDateTime.now(), s.getUrlAddress());
-                Response response = new Response.Builder()
-                        .code(503) // status code
-                        .request(getOkRequest(s))
-                        .protocol(Protocol.HTTP_1_1)
-                        .message("Server error")
-                        .body(ResponseBody.create("Service DOWN", MediaType.get("text/plain; charset=utf-8")
-                        ))
-                        .build();
-                createHitLog(s, response);
+                createServiceDownHitLog(s);
             }
             sendEmailNotifications(s.getId());
         }
+    }
+
+    private void createProblemHitLog(ServiceUrl s, Response response) throws IOException {
+        logger.info("{} {}- {} Service UP but with ERRORS {}", currentThread().getName(),
+                s.getRequestSchedule(), LocalDateTime.now(), s.getUrlAddress());
+        createHitLog(s, response);
+    }
+
+    private void createServiceDownHitLog(ServiceUrl s) {
+        logger.info("{} {}- {} Service DOWN {}", currentThread().getName(), s.getRequestSchedule(),
+                LocalDateTime.now(), s.getUrlAddress());
+        Response response = new Response.Builder()
+                .code(503)
+                .request(getOkRequest(s))
+                .protocol(Protocol.HTTP_1_1)
+                .message("Server error")
+                .body(ResponseBody.create("Service DOWN", MediaType.get("text/plain; charset=utf-8")
+                ))
+                .build();
+        createHitLog(s, response);
     }
 
     private void createHitLog(ServiceUrl s, Response response) {
@@ -107,15 +123,6 @@ public class ScheduledTasks {
         hitLogService.save(hitLog);
     }
 
-    private HttpRequest getHttpRequest(ServiceUrl s) {
-        return HttpRequest.newBuilder()
-                .version(HttpClient.Version.HTTP_1_1)
-                .uri(URI.create(s.getUrlAddress()))
-                .timeout(Duration.ofMinutes(1))
-                .GET()
-                .build();
-    }
-
     private Request getOkRequest(ServiceUrl s) {
         return new Request.Builder()
                 .url(s.getUrlAddress())
@@ -123,13 +130,21 @@ public class ScheduledTasks {
                 .build();
     }
 
-    private void sendEmailNotifications(long emailServiceId) {
-        List<HitLog> todayHitLog = hitLogService.findHitLogLessThenFour()
-                .stream().filter(h -> h.getServiceUrl().getId() == emailServiceId).collect(Collectors.toList());
-        for (HitLog h : todayHitLog) {
-            String subject = h.getResponseStatus() == 503 ? "Service DOWN " : "Service PROBLEM ";
+    private void sendEmailNotifications(long serviceId) {
+
+        List<HitLog> hitLogList = hitLogService.findTodayHitLog().stream()
+                .filter(h -> h.getServiceUrl().getId() == serviceId).collect(Collectors.toList());
+        if (hitLogList.size() > 3)
+            return;
+
+        Optional<HitLogDto> latestHitLog = hitLogList.stream().max(Comparator.comparing(HitLog::getCreated))
+                .map(Mapper::hitLogToDto);
+
+        if (latestHitLog.isPresent()){
+            String subject = latestHitLog.get().responseStatus() == 503 ? "Service DOWN " : "Service PROBLEM ";
             mailerService.sendSimpleMessage(emailService.getEmailSetting(),
-                    subject + h.getServiceUrl().getUrlAddress(), h.toString());
+                    subject + latestHitLog.get().serviceUrl(), latestHitLog.get().toString());
         }
     }
+
 }

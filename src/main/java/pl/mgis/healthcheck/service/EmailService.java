@@ -4,6 +4,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import pl.mgis.healthcheck.Mailer.MailerService;
+import pl.mgis.healthcheck.config.ValueEnDecrypt;
 import pl.mgis.healthcheck.dto.MailSettingDto;
 import pl.mgis.healthcheck.dto.Mapper;
 import pl.mgis.healthcheck.model.MailSetting;
@@ -25,17 +26,22 @@ public class EmailService {
         this.mailerService = mailerService;
     }
 
-    @Cacheable("getEmailSetting")
-    public MailSettingDto getEmailSetting() {
+    public MailSettingDto getEmailSettingDto() {
         Optional<MailSetting> first = emailRepository.findAll().stream().findFirst();
         return Mapper.mailSettingToDto(first.orElseGet(MailSetting::new));
     }
 
+    @Cacheable("getEmailSetting")
+    public MailSetting getEmailSetting() {
+        Optional<MailSetting> first = emailRepository.findAll().stream().findFirst();
+        return first.orElseGet(MailSetting::new);
+    }
+
     @CacheEvict(value ="getEmailSetting", allEntries=true)
     public void updateMailSetting(MailSettingDto mailSettingDto){
-        boolean verified = mailerService.verifyMailSettings(mailSettingDto);
         MailSetting mailSetting = Mapper.mailSettingFromDto(mailSettingDto);
-        mailSetting.setVerified(verified);
+        mailSetting.setPassword(ValueEnDecrypt.encrypt(mailSettingDto.password()));
+        mailSetting.setVerified(mailerService.verifyMailSettings(mailSetting));
         emailRepository.save(mailSetting);
     }
 }

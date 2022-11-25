@@ -5,7 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import pl.mgis.healthcheck.dto.MailSettingDto;
+import pl.mgis.healthcheck.config.ValueEnDecrypt;
+import pl.mgis.healthcheck.model.MailSetting;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -16,32 +17,30 @@ public class MailerService {
 
     private static final Logger logger = LoggerFactory.getLogger(MailerService.class);
 
-    public void sendSimpleMessage(MailSettingDto mailSetting, String subject, String message) {
-        if (!mailSetting.verified()) {
+    public void sendSimpleMessage(MailSetting mailSetting, String subject, String message) {
+
+        if (!mailSetting.isVerified()) {
             return;
         }
-        JavaMailSenderImpl mailSender;
-        try {
-            mailSender = mailSender(mailSetting);
-        } catch (Exception e) {
-            logger.info("No email notification message send!");
-            logger.info("Some e-mail properties are missing or are incorrect: {}", e.getMessage());
-            return;
-        }
+
+        JavaMailSenderImpl mailSender = mailSender(mailSetting);
         MimeMessage mimeMessage = mailSender.createMimeMessage();
+
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-            helper.setFrom(mailSetting.fromAddress());
-            helper.setTo(mailSetting.recipient());
+            helper.setFrom(mailSetting.getFromAddress());
+            helper.setTo(mailSetting.getRecipient());
             helper.setSubject(subject);
             helper.setText(message, true);
             mailSender.send(mimeMessage);
+            logger.info("Email send!");
         } catch (RuntimeException | MessagingException e) {
-            System.out.println(e.getMessage());
+            logger.info("No email notification message send!");
+            logger.info("Some e-mail properties are missing or are incorrect: {}", e.getMessage());
         }
     }
 
-    public boolean verifyMailSettings(MailSettingDto mailSetting) {
+    public boolean verifyMailSettings(MailSetting mailSetting) {
         JavaMailSenderImpl javaMailSender = mailSender(mailSetting);
         try {
             javaMailSender.testConnection();
@@ -52,16 +51,16 @@ public class MailerService {
         }
     }
 
-    public JavaMailSenderImpl mailSender(MailSettingDto mailSetting) {
+    public JavaMailSenderImpl mailSender(MailSetting mailSetting) {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost(mailSetting.hostAddress());
-        mailSender.setPort(mailSetting.smtpPort());
+        mailSender.setHost(mailSetting.getHostAddress());
+        mailSender.setPort(mailSetting.getSmtpPort());
 
-        mailSender.setUsername(mailSetting.username());
-        mailSender.setPassword(mailSetting.password());
+        mailSender.setUsername(mailSetting.getUsername());
+        mailSender.setPassword(ValueEnDecrypt.decrypt(mailSetting.getPassword()));
 
         Properties props = mailSender.getJavaMailProperties();
-        props.put("mail.transport.protocol", mailSetting.protocol());
+        props.put("mail.transport.protocol", mailSetting.getProtocol());
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.debug", "false");

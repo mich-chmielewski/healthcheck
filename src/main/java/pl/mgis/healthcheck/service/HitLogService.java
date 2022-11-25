@@ -18,11 +18,11 @@ public class HitLogService {
         this.hitLogRepository = hitLogRepository;
     }
 
-    public List<HitLog> findHitLogLessThenFour(){
-        return hitLogRepository.findHitLogsFromPresentDayLessThenFour();
+    public List<HitLog> findTodayHitLog(){
+        return hitLogRepository.findHitLogFromPresentDay();
     }
 
-    public List<HitLogDto> findHitLogFromPresentDay(){
+    public List<HitLogDto> findTodayHitLogDto(){
         return hitLogRepository.findHitLogFromPresentDay()
                 .stream().map(Mapper::hitLogToDto).collect(Collectors.toList());
     }
@@ -33,5 +33,13 @@ public class HitLogService {
 
     public List<HitLogDto> findAll() {
         return hitLogRepository.findAll().stream().map(Mapper::hitLogToDto).collect(Collectors.toList());
+    }
+
+    public List<HitLogDto> findHitLogFromDay(String fromDay) {
+        return hitLogRepository.findAllFromDay(fromDay).stream().map(Mapper::hitLogToDto).collect(Collectors.toList());
+    }
+
+    public void deleteAllHitLogs() {
+        hitLogRepository.deleteAll();
     }
 }

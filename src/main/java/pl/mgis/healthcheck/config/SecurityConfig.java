@@ -2,21 +2,12 @@ package pl.mgis.healthcheck.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
-import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
-
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
@@ -28,23 +19,39 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    public DataSource dataSource() {
-        return new EmbeddedDatabaseBuilder()
-                .setType(EmbeddedDatabaseType.H2)
-                .addScript(JdbcDaoImpl.DEFAULT_USER_SCHEMA_DDL_LOCATION)
-                .build();
+    private final DataSource dataSource;
+
+    private static final String[] AUTH_WHITELIST = {
+            // -- Swagger UI v2
+            "/v2/api-docs",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-ui",
+            "/swagger-ui/",
+            "/swagger-ui/**",
+            "/webjars/**",
+            "/v3/api-docs/**",
+            "/swagger-ui/**"
+    };
+
+    public SecurityConfig(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
                 .authorizeRequests().antMatchers("/login").permitAll()
-                .antMatchers("/view/**").hasRole("USER")
-                .anyRequest().authenticated()
-                .and().formLogin(withDefaults())
-                .logout().permitAll()
+                .antMatchers("/view/**", "/h2c/**")
+                .hasRole("USER")
+                .antMatchers(AUTH_WHITELIST)
+                .hasRole("USER")
+                .anyRequest()
+                .authenticated()
                 .and()
+                .formLogin(withDefaults())
                 .logout()
                 .permitAll()
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
@@ -52,9 +59,6 @@ public class SecurityConfig {
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID", "remember-me", "XSRF-TOKEN")
                 .logoutSuccessUrl("/login");
-                //.and()
-                //.exceptionHandling()
-                //.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
         http.headers().frameOptions().sameOrigin();
         return http.build();
     }
@@ -62,11 +66,11 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
-                .antMatchers("/images/**", "/js/**","/css/**", "/webjars/**", "/swagger-resources/**",
-                        "/swagger-ui/**", "/v3/api-docs");
+                .antMatchers("/images/**", "/js/**", "/css/**"/*,"/webjars/**","/swagger-resources/**","/swagger-ui/*"
+                        , "/swagger-ui/**", "/v3/api-docs","/v2/api-docs"*/);
     }
 
-    @Bean
+/*    @Bean
     public UserDetailsManager users(DataSource dataSource) {
         UserDetails user = User.builder()
                 .username("user")
@@ -76,7 +80,7 @@ public class SecurityConfig {
         JdbcUserDetailsManager users = new JdbcUserDetailsManager(dataSource);
         users.createUser(user);
         return users;
-    }
+    }*/
 
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source =

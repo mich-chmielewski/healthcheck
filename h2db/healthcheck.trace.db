@@ -1,0 +1,176 @@
+2022-11-18 11:11:08 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SERVICE_URL" not found (this database is empty); SQL statement:
+select serviceurl0_.id as id1_2_, serviceurl0_.request_schedule as request_2_2_, serviceurl0_.response_type as response3_2_, serviceurl0_.url_address as url_addr4_2_ from service_url serviceurl0_ [42104-214]
+2022-11-18 11:12:08 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SERVICE_URL" not found (this database is empty); SQL statement:
+select serviceurl0_.id as id1_2_, serviceurl0_.request_schedule as request_2_2_, serviceurl0_.response_type as response3_2_, serviceurl0_.url_address as url_addr4_2_ from service_url serviceurl0_ [42104-214]
+2022-11-18 11:13:08 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SERVICE_URL" not found (this database is empty); SQL statement:
+select serviceurl0_.id as id1_2_, serviceurl0_.request_schedule as request_2_2_, serviceurl0_.response_type as response3_2_, serviceurl0_.url_address as url_addr4_2_ from service_url serviceurl0_ [42104-214]
+2022-11-18 11:14:08 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SERVICE_URL" not found (this database is empty); SQL statement:
+select serviceurl0_.id as id1_2_, serviceurl0_.request_schedule as request_2_2_, serviceurl0_.response_type as response3_2_, serviceurl0_.url_address as url_addr4_2_ from service_url serviceurl0_ [42104-214]
+2022-11-18 11:22:44 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SERVICE_URL" not found (this database is empty); SQL statement:
+select serviceurl0_.id as id1_2_, serviceurl0_.request_schedule as request_2_2_, serviceurl0_.response_type as response3_2_, serviceurl0_.url_address as url_addr4_2_ from service_url serviceurl0_ [42104-214]
+2022-11-18 11:23:44 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SERVICE_URL" not found (this database is empty); SQL statement:
+select serviceurl0_.id as id1_2_, serviceurl0_.request_schedule as request_2_2_, serviceurl0_.response_type as response3_2_, serviceurl0_.url_address as url_addr4_2_ from service_url serviceurl0_ [42104-214]
+2022-11-18 11:37:17 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Błąd składniowy w wyrażeniu SQL "SELECT * FROM HIT_LOG MAIL_SETTING [*]SERVICE_URL"
+Syntax error in SQL statement "SELECT * FROM HIT_LOG MAIL_SETTING [*]SERVICE_URL"; SQL statement:
+SELECT * FROM HIT_LOG MAIL_SETTING SERVICE_URL [42000-214]
+2022-11-18 14:36:18 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLDataException: Błąd konwersji danych "2022-11-18 "
+Data conversion error converting "2022-11-18 "; SQL statement:
+SELECT H.* FROM HIT_LOG H WHERE FORMATDATETIME(CREATED,'yyyy-MM-dd ') = 2022-11-18 [22018-214]
+2022-11-25 09:23:03 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Funkcja " +\000d\000a            " nie istnieje
+Function " +\000d\000a            " not found; SQL statement:
+SELECT H.* FROM HIT_LOG H LEFT JOIN " +
+            "(SELECT COUNT(*)  AS HIT_NUMBER, SERVICE_URL_ID " +
+            "FROM HIT_LOG WHERE FORMATDATETIME(CREATED,'yyyy-MM-dd ') = CURRENT_DATE() GROUP BY SERVICE_URL_ID) B " +
+            "ON H.SERVICE_URL_ID = B.SERVICE_URL_ID " +
+            "WHERE B.HIT_NUMBER < 4 [90022-214]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:632)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:477)
+	at org.h2.message.DbException.get(DbException.java:223)
+	at org.h2.message.DbException.get(DbException.java:199)
+	at org.h2.command.Parser.getFunctionAliasWithinPath(Parser.java:2519)
+	at org.h2.command.Parser.readTableFunction(Parser.java:2012)
+	at org.h2.command.Parser.readTablePrimary(Parser.java:1860)
+	at org.h2.command.Parser.readTableReference(Parser.java:2334)
+	at org.h2.command.Parser.readTableReference(Parser.java:2351)
+	at org.h2.command.Parser.parseSelectFromPart(Parser.java:2772)
+	at org.h2.command.Parser.parseSelect(Parser.java:2878)
+	at org.h2.command.Parser.parseQueryPrimary(Parser.java:2762)
+	at org.h2.command.Parser.parseQueryTerm(Parser.java:2633)
+	at org.h2.command.Parser.parseQueryExpressionBody(Parser.java:2612)
+	at org.h2.command.Parser.parseQueryExpressionBodyAndEndOfQuery(Parser.java:2605)
+	at org.h2.command.Parser.parseQueryExpression(Parser.java:2598)
+	at org.h2.command.Parser.parseQuery(Parser.java:2567)
+	at org.h2.command.Parser.parsePrepared(Parser.java:724)
+	at org.h2.command.Parser.parse(Parser.java:689)
+	at org.h2.command.Parser.parse(Parser.java:661)
+	at org.h2.command.Parser.prepareCommand(Parser.java:569)
+	at org.h2.engine.SessionLocal.prepareLocal(SessionLocal.java:631)
+	at org.h2.engine.SessionLocal.prepareCommand(SessionLocal.java:554)
+	at org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1116)
+	at org.h2.jdbc.JdbcStatement.executeInternal(JdbcStatement.java:237)
+	at org.h2.jdbc.JdbcStatement.execute(JdbcStatement.java:223)
+	at org.h2.server.web.WebApp.getResult(WebApp.java:1339)
+	at org.h2.server.web.WebApp.query(WebApp.java:1137)
+	at org.h2.server.web.WebApp.query(WebApp.java:1113)
+	at org.h2.server.web.WebApp.process(WebApp.java:244)
+	at org.h2.server.web.WebApp.processRequest(WebApp.java:176)
+	at org.h2.server.web.WebServlet.doGet(WebServlet.java:129)
+	at org.h2.server.web.WebServlet.doPost(WebServlet.java:166)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:696)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:779)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:227)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:337)
+	at org.springframework.security.web.access.intercept.FilterSecurityInterceptor.invoke(FilterSecurityInterceptor.java:115)
+	at org.springframework.security.web.access.intercept.FilterSecurityInterceptor.doFilter(FilterSecurityInterceptor.java:81)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:122)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:126)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:81)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:109)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:149)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter.doFilterInternal(DefaultLogoutPageGeneratingFilter.java:58)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter.doFilter(DefaultLoginPageGeneratingFilter.java:237)
+	at org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter.doFilter(DefaultLoginPageGeneratingFilter.java:223)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:223)
+	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:217)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:103)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:89)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:112)
+	at org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:82)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:55)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:221)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:186)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:354)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:267)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:197)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:97)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:541)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:135)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:78)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:360)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:399)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:65)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:893)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1789)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.base/java.lang.Thread.run(Thread.java:833)
+2022-11-25 09:25:14 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Błąd składniowy w wyrażeniu SQL "SELECT H.* FROM HIT_LOG H LEFT JOIN \000d\000a            (SELECT COUNT(*)  AS HIT_NUMBER, SERVICE_URL_ID \000d\000a            FROM HIT_LOG WHERE FORMATDATETIME(CREATED,'yyyy-MM-dd ') = CURRENT_DATE() GROUP BY SERVICE_URL_ID) B \000d\000a            ON H.SERVICE_URL_ID = B.SERVICE_URL_ID \000d\000a            WHERE B.HIT_NUMBER < 4[*])"
+Syntax error in SQL statement "SELECT H.* FROM HIT_LOG H LEFT JOIN \000d\000a            (SELECT COUNT(*)  AS HIT_NUMBER, SERVICE_URL_ID \000d\000a            FROM HIT_LOG WHERE FORMATDATETIME(CREATED,'yyyy-MM-dd ') = CURRENT_DATE() GROUP BY SERVICE_URL_ID) B \000d\000a            ON H.SERVICE_URL_ID = B.SERVICE_URL_ID \000d\000a            WHERE B.HIT_NUMBER < 4[*])"; SQL statement:
+SELECT H.* FROM HIT_LOG H LEFT JOIN 
+            (SELECT COUNT(*)  AS HIT_NUMBER, SERVICE_URL_ID 
+            FROM HIT_LOG WHERE FORMATDATETIME(CREATED,'yyyy-MM-dd ') = CURRENT_DATE() GROUP BY SERVICE_URL_ID) B 
+            ON H.SERVICE_URL_ID = B.SERVICE_URL_ID 
+            WHERE B.HIT_NUMBER < 4) [42000-214]
+2022-11-25 09:27:45 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Błąd składniowy w wyrażeniu SQL "SELECT H.* FROM HIT_LOG H LEFT JOIN \000d\000a            (SELECT COUNT(*)  AS HIT_NUMBER, SERVICE_URL_ID \000d\000a            FROM HIT_LOG WHERE FORMATDATETIME(CREATED,'yyyy-MM-dd ') = CURRENT_DATE() GROUP BY SERVICE_URL_ID) B \000d\000a            ON H.SERVICE_URL_ID = B.SERVICE_URL_ID \000d\000a            WHERE B.HIT_NUMBER < 4 AND[*]"; oczekiwano "INTERSECTS (, NOT, EXISTS, UNIQUE, INTERSECTS"
+Syntax error in SQL statement "SELECT H.* FROM HIT_LOG H LEFT JOIN \000d\000a            (SELECT COUNT(*)  AS HIT_NUMBER, SERVICE_URL_ID \000d\000a            FROM HIT_LOG WHERE FORMATDATETIME(CREATED,'yyyy-MM-dd ') = CURRENT_DATE() GROUP BY SERVICE_URL_ID) B \000d\000a            ON H.SERVICE_URL_ID = B.SERVICE_URL_ID \000d\000a            WHERE B.HIT_NUMBER < 4 AND[*]"; expected "INTERSECTS (, NOT, EXISTS, UNIQUE, INTERSECTS"; SQL statement:
+SELECT H.* FROM HIT_LOG H LEFT JOIN 
+            (SELECT COUNT(*)  AS HIT_NUMBER, SERVICE_URL_ID 
+            FROM HIT_LOG WHERE FORMATDATETIME(CREATED,'yyyy-MM-dd ') = CURRENT_DATE() GROUP BY SERVICE_URL_ID) B 
+            ON H.SERVICE_URL_ID = B.SERVICE_URL_ID 
+            WHERE B.HIT_NUMBER < 4 AND [42001-214]
+2022-11-25 09:34:49 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Błąd składniowy w wyrażeniu SQL "SELECT H.* FROM HIT_LOG H LEFT JOIN \000d\000a            (SELECT COUNT(*)  AS HIT_NUMBER, SERVICE_URL_ID \000d\000a            FROM HIT_LOG WHERE FORMATDATETIME(CREATED,'yyyy-MM-dd ') = CURRENT_DATE() GROUP BY SERVICE_URL_ID) B \000d\000a            ON H.SERVICE_URL_ID = B.SERVICE_URL_ID \000d\000a            [*]""WHERE B.HIT_NUMBER < 4"
+Syntax error in SQL statement "SELECT H.* FROM HIT_LOG H LEFT JOIN \000d\000a            (SELECT COUNT(*)  AS HIT_NUMBER, SERVICE_URL_ID \000d\000a            FROM HIT_LOG WHERE FORMATDATETIME(CREATED,'yyyy-MM-dd ') = CURRENT_DATE() GROUP BY SERVICE_URL_ID) B \000d\000a            ON H.SERVICE_URL_ID = B.SERVICE_URL_ID \000d\000a            [*]""WHERE B.HIT_NUMBER < 4"; SQL statement:
+SELECT H.* FROM HIT_LOG H LEFT JOIN 
+            (SELECT COUNT(*)  AS HIT_NUMBER, SERVICE_URL_ID 
+            FROM HIT_LOG WHERE FORMATDATETIME(CREATED,'yyyy-MM-dd ') = CURRENT_DATE() GROUP BY SERVICE_URL_ID) B 
+            ON H.SERVICE_URL_ID = B.SERVICE_URL_ID 
+            "WHERE B.HIT_NUMBER < 4 [42000-214]

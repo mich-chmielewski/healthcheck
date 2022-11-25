@@ -3,30 +3,70 @@
       xmlns:th="http://thymeleaf.org">
 <main id="replacedMain" th:fragment="main-empty">
 </main>
+<main id="replacedMain" th:fragment="main-hitlog">
+    <div class="container-fluid px-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <form class="form-inline">
+                    <div class="form-group mx-sm-3 mb-2">
+                            <i class="fas fa-table me-1"></i>
+                            <label for="datepicker" class="col-form-label">Select date:</label>
+                        <input type="text" name="fromday" data-date-format="yyyy-mm-dd" id="datepicker" th:value="${dateValue}">
+                        <button type="button" onclick="deleteAllHitLogs();" class="btn btn-primary btn-sm btn-add" data-toggle="modal">
+                            <i class="fas fa-trash"></i> Delete All
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-body">
+                <table id="simpleTable" class="display cell-border">
+                    <thead>
+                    <tr>
+                        <th>Created</th>
+                        <th>Url address</th>
+                        <th>Resp. status</th>
+                        <th>Resp. body</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="h: ${hitLogList}">
+                        <td th:text="${h.created}"></td>
+                        <td th:text="${h.serviceUrl}"></td>
+                        <td><p th:text="${h.responseStatus}"></p></td>
+                        <td><p th:text="${h.responseBody}"></p></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
 <main id="replacedMain" th:fragment="main-dashboard">
     <div class="container-fluid px-4">
-        <div class="card-header">
-            <i class="fas fa-tachometer-alt me-1"></i>
-            Dashbord
-        </div>
-        <div class="row">
-            <div class="col-lg-6">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <i class="fas fa-chart-bar me-1"></i>
-                        Zgłoszenia o typie
-                    </div>
-                    <div class="card-body">zzz</div>
-                </div>
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
+                Today's Hit Log
             </div>
-            <div class="col-lg-6">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <i class="fas fa-chart-bar me-1"></i>
-                        Zgłoszenia o statusie
-                    </div>
-                    <div class="card-body">vvvv</div>
-                </div>
+            <div class="card-body">
+                <table id="simpleTable" class="display cell-border">
+                    <thead>
+                    <tr>
+                        <th>Created</th>
+                        <th>Url address</th>
+                        <th>Resp. status</th>
+                        <th>Resp. body</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="h: ${hitLogList}">
+                        <td th:text="${h.created}"></td>
+                        <td th:text="${h.serviceUrl}"></td>
+                        <td><p th:text="${h.responseStatus}"></p></td>
+                        <td><p th:text="${h.responseBody}"></p></td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -85,7 +125,7 @@
                     <thead>
                     <tr>
                         <th></th>
-                        <th>URL Adress</th>
+                        <th>URL Address</th>
                         <th>Resp. Type</th>
                         <th>Req. Schedule</th>
                     </tr>

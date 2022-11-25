@@ -6,13 +6,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pl.mgis.healthcheck.dto.MailSettingDto;
 import pl.mgis.healthcheck.dto.ServiceUrlDto;
-import pl.mgis.healthcheck.model.MailSetting;
 import pl.mgis.healthcheck.service.EmailService;
+import pl.mgis.healthcheck.service.HitLogService;
 import pl.mgis.healthcheck.service.ServiceUrlService;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,10 +22,12 @@ public class ViewController {
 
     private final EmailService emailService;
     private final ServiceUrlService serviceUrlService;
+    private final HitLogService hitLogService;
 
-    public ViewController(EmailService emailService, ServiceUrlService serviceUrlService) {
+    public ViewController(EmailService emailService, ServiceUrlService serviceUrlService, HitLogService hitLogService) {
         this.emailService = emailService;
         this.serviceUrlService = serviceUrlService;
+        this.hitLogService = hitLogService;
     }
 
     @GetMapping("favicon.ico")
@@ -32,15 +35,26 @@ public class ViewController {
     void disableFavicon() {
     }
 
-/*    @GetMapping({"/","/{page}"})
-    public String start(@PathVariable(value = "page",required = false) String page) {
+    @GetMapping("/")
+    public String start() {
         return "redirect:/view/dashboard";
-    }*/
+    }
 
-    @GetMapping("/authorize")
+    @GetMapping("/sw")
+    public String swagger() {
+            return "redirect:/swagger-ui/";
+    }
+
+    @PostMapping("/verify")
     public @ResponseBody boolean isUserLoggedIn() {
         return SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof UserDetails;
     }
+
+    @GetMapping("/verify")
+    public String redirect() {
+        return "redirect:/view/dashboard";
+    }
+
 
     @GetMapping("/view/")
     public String index(Model model) {
@@ -61,29 +75,38 @@ public class ViewController {
 
     @PostMapping("/view/dashboard")
     public String dashboard(Model model) {
-
+        model.addAttribute("hitLogList", hitLogService.findTodayHitLogDto());
         return "view/main-content :: main-dashboard";
+    }
+
+    @PostMapping("/view/hitlog")
+    public String hitLog(@RequestParam(name = "fromday", required = false) String fromDay, Model model) {
+        if (fromDay == null) {
+            fromDay = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
+        }
+        Object hitLogFromDay = hitLogService.findHitLogFromDay(fromDay);
+        model.addAttribute("hitLogList", hitLogService.findHitLogFromDay(fromDay));
+        model.addAttribute("dateValue", fromDay);
+        return "view/main-content :: main-hitlog";
     }
 
     @PostMapping("/view/services")
     public String getServiceUrlList(Model model) {
         List<ServiceUrlDto> serviceUrlList = new ArrayList<>(serviceUrlService.getAll());
-        model.addAttribute("serviceUrlList",serviceUrlList);
+        model.addAttribute("serviceUrlList", serviceUrlList);
         return "view/main-content :: main-services";
     }
 
     @PostMapping("/view/mail")
     public String getMailObject(Model model) {
-        MailSettingDto mailSettingDto = emailService.getEmailSetting();
-        model.addAttribute("mailSetting",mailSettingDto);
+        MailSettingDto mailSettingDto = emailService.getEmailSettingDto();
+        model.addAttribute("mailSetting", mailSettingDto);
         return "view/main-content :: main-mail";
     }
 
     @PostMapping("/view/mail/save")
-    public String saveMailObject(@ModelAttribute MailSettingDto mailSettingsDto, RedirectAttributes redirectAttrs) {
+    public String saveMailObject(@ModelAttribute MailSettingDto mailSettingsDto) {
         emailService.updateMailSetting(mailSettingsDto);
-        //redirectAttrs.addFlashAttribute("msg", msg);
-        //redirectAttrs.addFlashAttribute("info", info);
         return "redirect:/view/mail";
     }
 

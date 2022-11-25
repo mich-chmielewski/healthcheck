@@ -11,7 +11,7 @@ public class Mapper {
 
     public static HitLogDto hitLogToDto(HitLog hitLog) {
         return new HitLogDto(hitLog.getId(), hitLog.getResponseStatus(), hitLog.getResponseBody(),
-                hitLog.getCreated());
+                hitLog.getCreated(),hitLog.getServiceUrl().getUrlAddress());
     }
 
     public static ServiceUrlDto serviceUrlToDto(ServiceUrl serviceUrl) {
