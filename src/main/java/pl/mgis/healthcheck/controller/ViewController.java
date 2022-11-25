@@ -40,11 +40,6 @@ public class ViewController {
         return "redirect:/view/dashboard";
     }
 
-    @GetMapping("/sw")
-    public String swagger() {
-            return "redirect:/swagger-ui/";
-    }
-
     @PostMapping("/verify")
     public @ResponseBody boolean isUserLoggedIn() {
         return SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof UserDetails;
