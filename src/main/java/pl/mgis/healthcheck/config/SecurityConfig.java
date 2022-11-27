@@ -43,7 +43,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-                .authorizeRequests().antMatchers("/login").permitAll()
+                .authorizeRequests().antMatchers("/login","/verify").permitAll()
                 .antMatchers("/view/**", "/h2c/**")
                 .hasRole("USER")
                 .antMatchers(AUTH_WHITELIST)

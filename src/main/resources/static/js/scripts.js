@@ -17,11 +17,11 @@ window.addEventListener('DOMContentLoaded', event => {
 
 
 function getMainContent(page , postData=null) {
+    isLogged();
     if (page === null) page = 'dashboard';
     if (event) event.preventDefault();
     window.history.replaceState("","Loaded Page",page);
     let url = '/view/' + page.toLowerCase();
-    isLogged();
     $.post(url,postData,function(data, textStatus, jqXHR) {
         $('#replacedMain').html(data);
         delete table;
@@ -83,11 +83,8 @@ function showAlert(msgTitle, msgBody, msgType) {
 
 async function isLogged() {
     let url = '/verify';
-    fetch(url,{ method: 'POST', redirect:'follow'})
+    fetch(url,{ method: 'POST'/*, redirect:'follow'*/})
         .then(response => {
-            if (response.redirected === true)
-                window.location.href = "/login?error";
-
             response.json().then(value  => {
              if (value === false)
                 window.location.href = "/login?error";

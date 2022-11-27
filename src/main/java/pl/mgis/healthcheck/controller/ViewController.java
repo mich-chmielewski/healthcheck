@@ -1,6 +1,7 @@
 package pl.mgis.healthcheck.controller;
 
 
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -42,13 +43,16 @@ public class ViewController {
 
     @PostMapping("/verify")
     public @ResponseBody boolean isUserLoggedIn() {
-        return SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof UserDetails;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null)
+            return authentication.getPrincipal() instanceof UserDetails;
+        return false;
     }
 
-    @GetMapping("/verify")
+/*    @GetMapping("/verify")
     public String redirect() {
         return "redirect:/view/dashboard";
-    }
+    }*/
 
 
     @GetMapping("/view/")
