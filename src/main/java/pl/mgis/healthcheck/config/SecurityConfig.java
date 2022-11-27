@@ -21,20 +21,18 @@ public class SecurityConfig {
 
     private final DataSource dataSource;
 
-    private static final String[] AUTH_WHITELIST = {
-            // -- Swagger UI v2
+/*    private static final String[] AUTH_SWAGGER_WHITELIST = {
             "/v2/api-docs",
             "/swagger-resources",
             "/swagger-resources/**",
             "/configuration/ui",
             "/configuration/security",
             "/swagger-ui",
-            "/swagger-ui/",
             "/swagger-ui/**",
             "/webjars/**",
             "/v3/api-docs/**",
             "/swagger-ui/**"
-    };
+    };*/
 
     public SecurityConfig(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -46,8 +44,8 @@ public class SecurityConfig {
                 .authorizeRequests().antMatchers("/login","/verify").permitAll()
                 .antMatchers("/view/**", "/h2c/**")
                 .hasRole("USER")
-                .antMatchers(AUTH_WHITELIST)
-                .hasRole("USER")
+/*                .antMatchers(AUTH_SWAGGER_WHITELIST)
+                .hasRole("USER")*/
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -66,22 +64,10 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
-                .antMatchers("/images/**", "/js/**", "/css/**"/*,"/webjars/**","/swagger-resources/**","/swagger-ui/*"
-                        , "/swagger-ui/**", "/v3/api-docs","/v2/api-docs"*/);
+                .antMatchers("/images/**", "/js/**", "/css/**");
     }
 
-/*    @Bean
-    public UserDetailsManager users(DataSource dataSource) {
-        UserDetails user = User.builder()
-                .username("user")
-                .password("{bcrypt}" + new BCryptPasswordEncoder().encode("user"))
-                .roles("USER")
-                .build();
-        JdbcUserDetailsManager users = new JdbcUserDetailsManager(dataSource);
-        users.createUser(user);
-        return users;
-    }*/
-
+    @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
