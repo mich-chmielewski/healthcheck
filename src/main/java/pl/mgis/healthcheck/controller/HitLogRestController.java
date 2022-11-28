@@ -3,10 +3,7 @@ package pl.mgis.healthcheck.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.mgis.healthcheck.dto.HitLogDto;
 import pl.mgis.healthcheck.service.HitLogService;
 
@@ -38,5 +35,10 @@ public class HitLogRestController {
         hitLogService.deleteAllHitLogs();
     }
 
+    @DeleteMapping("/api/hitlogs/{date}")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void deleteByDate( @PathVariable(name = "date") String date) {
+        hitLogService.deleteByDateHitLogs(date);
+    }
 
 }

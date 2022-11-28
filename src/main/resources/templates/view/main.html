@@ -25,7 +25,8 @@
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i
                 class="fas fa-bars"></i></button>
         <!-- Navbar-->
-        <a class="nav-link" href="/logout" role="button" aria-expanded="false" style="position:absolute;right:0;color:#fff"><i class="fas fa-user fa-fw"></i>Log out</a>
+        <a class="nav-link" href="/logout" role="button" aria-expanded="false"
+           style="position:absolute;right:0;color:#fff"><i class="fas fa-user fa-fw"></i>Log out</a>
     </nav>
 </header>
 <div id="layoutSidenav">
@@ -39,7 +40,7 @@
                         Dashboard
                     </a>
                     <a class="nav-link" href="#" onclick="getMainContent('hitlog');">
-                        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                        <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                         Error HitLogs
                     </a>
                     <div class="sb-sidenav-menu-heading">Administration</div>
@@ -55,21 +56,21 @@
                         <div class="sb-nav-link-icon"><i class="fas fa-database"></i></div>
                         H2 Console
                     </a>
-                    </div>
                 </div>
-                <div class="sb-sidenav-footer">
-                    <div class="small">Logged user:</div>
-                     <span th:text="${#authentication.principal.username}"></span>
-                    <span th:text="${#authentication.principal.authorities}"></span>
+            </div>
+            <div class="sb-sidenav-footer">
+                <div class="small">Logged user:</div>
+                <span th:text="${#authentication.principal.username}"></span>
+                <!--<span th:text="${#authentication.principal.authorities}"></span>-->
+            </div>
+            <div class="sb-sidenav-footer">
+                <div class="text-muted">&copy; HealthCheck
+                    <script>document.write(new Date().getFullYear())</script>
                 </div>
-                <div class="sb-sidenav-footer">
-                    <div class="text-muted">&copy; HealthCheck
-                        <script>document.write(new Date().getFullYear())</script>
-                    </div>
-                    <div>
-                        <a target="_blank" href="https://github.com/mich-chmielewski">Have some fun!</a>
-                    </div>
+                <div>
+                    <a target="_blank" href="https://github.com/mich-chmielewski">Have some fun!</a>
                 </div>
+            </div>
         </nav>
     </div>
     <div id="layoutSidenav_content">
@@ -86,7 +87,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" id="confirm-no" class="btn btn-secondary">Cancel</button>
-                        <button id="confirm-yes" type="button"  class="btn btn-primary">Yes</button>
+                        <button id="confirm-yes" type="button" class="btn btn-primary">Yes</button>
                     </div>
                 </div>
             </div>
@@ -141,6 +142,8 @@ if (msg == "Warning"){
     $('#warningMsg').show();
 }
 getMainContent(pageSpring);
+
+
 </script>
 </body>
 </html>

@@ -1,11 +1,10 @@
-package pl.mgis.healthcheck.Mailer;
+package pl.mgis.healthcheck.tool;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import pl.mgis.healthcheck.config.ValueEnDecrypt;
 import pl.mgis.healthcheck.model.MailSetting;
 
 import javax.mail.MessagingException;
@@ -16,6 +15,11 @@ import java.util.Properties;
 public class MailerService {
 
     private static final Logger logger = LoggerFactory.getLogger(MailerService.class);
+    private final KeyCrypt keyCrypt;
+
+    public MailerService(KeyCrypt keyCrypt) {
+        this.keyCrypt = keyCrypt;
+    }
 
     public void sendSimpleMessage(MailSetting mailSetting, String subject, String message) {
 
@@ -57,7 +61,7 @@ public class MailerService {
         mailSender.setPort(mailSetting.getSmtpPort());
 
         mailSender.setUsername(mailSetting.getUsername());
-        mailSender.setPassword(ValueEnDecrypt.decrypt(mailSetting.getPassword()));
+        mailSender.setPassword(ValueEnDecrypt.decrypt(mailSetting.getPassword(),keyCrypt.getKeyCrypt()));
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", mailSetting.getProtocol());

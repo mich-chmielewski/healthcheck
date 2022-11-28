@@ -166,11 +166,11 @@ function deleteServiceUrl(id) {
     });
 };
 
-function deleteAllHitLogs() {
+function deleteHitLogs(date = '') {
     event.preventDefault();
     bootbox.confirm("Confirm delete operation?", function(result) {
      if(result){
-        let url = '/api/hitlogs/';
+        let url = '/api/hitlogs/'+date;
         fetch(url,{
            method: 'DELETE',
            headers: {

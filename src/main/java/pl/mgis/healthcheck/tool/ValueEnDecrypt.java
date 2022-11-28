@@ -1,4 +1,4 @@
-package pl.mgis.healthcheck.config;
+package pl.mgis.healthcheck.tool;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +13,7 @@ import java.util.Base64;
 
 public class ValueEnDecrypt {
 
-    private static final String MY_KEY = "jabadabadoo";
+    //private static final String MY_KEY = "jabadabadoo";
     private static SecretKeySpec secretKey;
     private static byte[] key;
     private static final Logger logger = LoggerFactory.getLogger(ValueEnDecrypt.class);
@@ -31,9 +31,9 @@ public class ValueEnDecrypt {
         }
     }
 
-    public static String encrypt(final String strToEncrypt) {
+    public static String encrypt(final String strToEncrypt, String keyCrypt) {
         try {
-            setKey(MY_KEY);
+            setKey(keyCrypt);
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
             return Base64.getEncoder()
@@ -44,9 +44,9 @@ public class ValueEnDecrypt {
         return null;
     }
 
-    public static String decrypt(final String strToDecrypt) {
+    public static String decrypt(final String strToDecrypt, String keyCrypt) {
         try {
-            setKey(MY_KEY);
+            setKey(keyCrypt);
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
             return new String(cipher.doFinal(Base64.getDecoder()

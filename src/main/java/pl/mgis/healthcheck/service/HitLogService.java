@@ -42,4 +42,8 @@ public class HitLogService {
     public void deleteAllHitLogs() {
         hitLogRepository.deleteAll();
     }
+
+    public void deleteByDateHitLogs(String date) {
+        hitLogRepository.deleteByDate(date);
+    }
 }

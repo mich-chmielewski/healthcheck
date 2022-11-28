@@ -1,16 +1,18 @@
-package pl.mgis.healthcheck.service;
+package pl.mgis.healthcheck.tool;
 
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import pl.mgis.healthcheck.Mailer.MailerService;
 import pl.mgis.healthcheck.dto.HitLogDto;
 import pl.mgis.healthcheck.dto.Mapper;
 import pl.mgis.healthcheck.model.HitLog;
 import pl.mgis.healthcheck.model.RequestSchedule;
 import pl.mgis.healthcheck.model.ServiceUrl;
+import pl.mgis.healthcheck.service.EmailService;
+import pl.mgis.healthcheck.service.HitLogService;
+import pl.mgis.healthcheck.service.ServiceUrlService;
 
 import java.io.IOException;
 import java.time.LocalDateTime;

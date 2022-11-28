@@ -1,8 +1,8 @@
 spring:
     datasource:
         url: jdbc:h2:file:./h2db/healthcheck
-        username: sa
-        password: sa
+        username: ${USER_NAME}
+        password: ${USER_PASS}
         driverClassName: org.h2.Driver
     h2:
         console:
@@ -32,3 +32,6 @@ spring:
             name: ${USER_NAME}
             password: ${USER_PASS}
             roles: USER
+application:
+    keycrypt:
+        value: ${KEY_CRYPT}

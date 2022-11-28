@@ -7,17 +7,30 @@
     <div class="container-fluid px-4">
         <div class="card mb-4">
             <div class="card-header">
-                <form class="form-inline">
-                    <div class="form-group mx-sm-3 mb-2">
-                            <i class="fas fa-table me-1"></i>
-                            <label for="datepicker" class="col-form-label">Select date:</label>
-                        <input type="text" name="fromday" data-date-format="yyyy-mm-dd" id="datepicker" th:value="${dateValue}">
-                        <button type="button" onclick="deleteAllHitLogs();" class="btn btn-primary btn-sm btn-add" data-toggle="modal">
-                            <i class="fas fa-trash"></i> Delete All
-                        </button>
-                    </div>
-                </form>
+                <i class="fas fa-table me-1"></i>
+                Hit Log
             </div>
+            <form class="row g-4">
+                <div class="col-auto">
+                    <label for="datepicker" class="col-form-label">Select date:</label>
+                </div>
+                <div class="col-auto">
+                    <input type="text" class="form-control" name="fromday" data-date-format="yyyy-mm-dd" id="datepicker"
+                           th:value="${dateValue}">
+                </div>
+                <div class="col-auto">
+                    <button type="button" onclick="deleteHitLogs(this.getAttribute('data-value'));" class="btn btn-primary btn-sm btn-add"
+                            data-toggle="modal" th:data-value="${dateValue}">
+                        <i class="fas fa-trash"></i> Delete from selected date
+                    </button>
+                </div>
+                <div class="col-auto">
+                    <button type="button" onclick="deleteHitLogs();" class="btn btn-primary btn-sm btn-add"
+                            data-toggle="modal">
+                        <i class="fas fa-trash"></i> Delete All
+                    </button>
+                </div>
+            </form>
             <div class="card-body">
                 <table id="simpleTable" class="display cell-border">
                     <thead>
@@ -116,7 +129,9 @@
             <div class="card-header">
                 <i class="fas fa-table me-1"></i>
                 Services
-                <button type="button" onclick="addServiceModal();" class="btn btn-primary btn-sm btn-add" data-toggle="modal">
+            </div>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="button" onclick="addServiceModal();" class="btn btn-primary btn-sm" data-toggle="modal">
                     <i class="fas fa-plus-square"></i> Add new
                 </button>
             </div>
@@ -135,15 +150,17 @@
                         <td><a href="#" th:attr="onclick=${'getServiceUrl('+serviceUrl.id+')'}"
                                class="btn btn-outline-primary btn-sm" role="button"><i
                                 class="fas fa-pencil-alt"></i>
-                            </a>
+                        </a>
                             <a href="#" th:attr="onclick=${'deleteServiceUrl('+serviceUrl.id+')'}"
-                              class="btn btn-outline-primary btn-sm"
-                              role="button"><i class="far fa-trash-alt"></i>
+                               class="btn btn-outline-primary btn-sm"
+                               role="button"><i class="far fa-trash-alt"></i>
                             </a>
                         </td>
                         <td th:text="${serviceUrl.urlAddress}"></td>
-                        <td><p th:text="${serviceUrl.responseType}" th:data-status="${serviceUrl.responseType}"></p></td>
-                        <td><p th:text="${serviceUrl.requestSchedule}" th:data-status="${serviceUrl.requestSchedule}"></p></td>
+                        <td><p th:text="${serviceUrl.responseType}" th:data-status="${serviceUrl.responseType}"></p>
+                        </td>
+                        <td><p th:text="${serviceUrl.requestSchedule}"
+                               th:data-status="${serviceUrl.requestSchedule}"></p></td>
                     </tr>
                     </tbody>
                 </table>
@@ -157,8 +174,17 @@
         <div class="card mb-4">
             <div class="card-header">
                 <i class="fas fa-table me-1"></i>
-                 Email Notify Config
-                <button type="submit" class="btn btn-primary btn-sm btn-add" form="formSetting">Save</button>
+                Email Notify Config
+            </div>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <div>
+                    Email settings correct: <strong th:text="${mailSetting.verified}"></strong>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary btn-sm" form="formSetting">
+                        <i class="fas fa-save"></i> Save
+                    </button>
+                </div>
             </div>
             <div class="card-body">
                 <form id="formSetting" th:object="${mailSetting}" th:action="@{/view/mail/save}"
@@ -167,9 +193,6 @@
                     <input type="hidden" th:field="*{verified}" class="form-control"/>
                     <table id="simpleTable" class="display cell-border">
                         <thead>
-                        <tr>
-                            <th colspan="2">Email settings correct: <strong th:text="*{verified}"></strong></th>
-                        </tr>
                         <tr>
                             <th>Field</th>
                             <th>Value</th>
