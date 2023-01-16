@@ -1,0 +1,227 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://thymeleaf.org">
+<main id="replacedMain" th:fragment="main-empty">
+</main>
+<main id="replacedMain" th:fragment="main-hitlog">
+    <div class="container-fluid px-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <form class="form-inline">
+                    <div class="form-group mx-sm-3 mb-2">
+                            <i class="fas fa-table me-1"></i>
+                            <label for="datepicker" class="col-form-label">Select date:</label>
+                        <input type="text" name="fromday" data-date-format="yyyy-mm-dd" id="datepicker" th:value="${dateValue}">
+                        <button type="button" onclick="deleteAllHitLogs();" class="btn btn-primary btn-sm btn-add" data-toggle="modal">
+                            <i class="fas fa-trash"></i> Delete All
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-body">
+                <table id="simpleTable" class="display cell-border">
+                    <thead>
+                    <tr>
+                        <th>Created</th>
+                        <th>Url address</th>
+                        <th>Resp. status</th>
+                        <th>Resp. body</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="h: ${hitLogList}">
+                        <td th:text="${h.created}"></td>
+                        <td th:text="${h.serviceUrl}"></td>
+                        <td><p th:text="${h.responseStatus}"></p></td>
+                        <td><p th:text="${h.responseBody}"></p></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+<main id="replacedMain" th:fragment="main-dashboard">
+    <div class="container-fluid px-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
+                Today's Hit Log
+            </div>
+            <div class="card-body">
+                <table id="simpleTable" class="display cell-border">
+                    <thead>
+                    <tr>
+                        <th>Created</th>
+                        <th>Url address</th>
+                        <th>Resp. status</th>
+                        <th>Resp. body</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="h: ${hitLogList}">
+                        <td th:text="${h.created}"></td>
+                        <td th:text="${h.serviceUrl}"></td>
+                        <td><p th:text="${h.responseStatus}"></p></td>
+                        <td><p th:text="${h.responseBody}"></p></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+<main th:fragment="main-services">
+    <div class="modal fade" id="serviceModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Services</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="serviceUrlForm">
+                        <input type="hidden" name="id" id="id">
+                        <input type="hidden" id="operation" name="operation" value="post">
+                        <div class="form-group">
+                            <label for="urlAddress" class="col-form-label">URL Adress:</label>
+                            <input type="text" class="form-control" name="urlAddress" id="urlAddress">
+                        </div>
+                        <div class="form-group">
+                            <label for="responseType" class="col-form-label">Resp. Type:</label>
+                            <select class="form-select" name="responseType" id="responseType">
+                                <option th:each="responseType : ${T(pl.mgis.healthcheck.model.ResponseType).values()}"
+                                        th:value="${responseType}" th:text="${responseType}"></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="requestSchedule" class="col-form-label">Req. Schedule:</label>
+                            <select class="form-select" name="requestSchedule" id="requestSchedule">
+                                <option th:each="requestSchedule : ${T(pl.mgis.healthcheck.model.RequestSchedule).values()}"
+                                        th:value="${requestSchedule}" th:text="${requestSchedule}"></option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" onclick="sendServiceForm();" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid px-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
+                Services
+                <button type="button" onclick="addServiceModal();" class="btn btn-primary btn-sm btn-add" data-toggle="modal">
+                    <i class="fas fa-plus-square"></i> Add new
+                </button>
+            </div>
+            <div class="card-body">
+                <table id="simpleTable" class="display cell-border">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>URL Address</th>
+                        <th>Resp. Type</th>
+                        <th>Req. Schedule</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="serviceUrl: ${serviceUrlList}">
+                        <td><a href="#" th:attr="onclick=${'getServiceUrl('+serviceUrl.id+')'}"
+                               class="btn btn-outline-primary btn-sm" role="button"><i
+                                class="fas fa-pencil-alt"></i>
+                            </a>
+                            <a href="#" th:attr="onclick=${'deleteServiceUrl('+serviceUrl.id+')'}"
+                              class="btn btn-outline-primary btn-sm"
+                              role="button"><i class="far fa-trash-alt"></i>
+                            </a>
+                        </td>
+                        <td th:text="${serviceUrl.urlAddress}"></td>
+                        <td><p th:text="${serviceUrl.responseType}" th:data-status="${serviceUrl.responseType}"></p></td>
+                        <td><p th:text="${serviceUrl.requestSchedule}" th:data-status="${serviceUrl.requestSchedule}"></p></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<main th:fragment="main-mail">
+    <div class="container-fluid px-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
+                 Email Notify Config
+                <button type="submit" class="btn btn-primary btn-sm btn-add" form="formSetting">Save</button>
+            </div>
+            <div class="card-body">
+                <form id="formSetting" th:object="${mailSetting}" th:action="@{/view/mail/save}"
+                      th:method="post">
+                    <input type="hidden" th:field="*{id}" class="form-control"/>
+                    <input type="hidden" th:field="*{verified}" class="form-control"/>
+                    <table id="simpleTable" class="display cell-border">
+                        <thead>
+                        <tr>
+                            <th colspan="2">Email settings correct: <strong th:text="*{verified}"></strong></th>
+                        </tr>
+                        <tr>
+                            <th>Field</th>
+                            <th>Value</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Host Address</td>
+                            <td>
+                                <input type="text" th:field="*{hostAddress}" class="form-control"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SMTP port</td>
+                            <td>
+                                <input type="text" th:field="*{smtpPort}" class="form-control"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Protocol</td>
+                            <td>
+                                <input type="text" th:field="*{protocol}" class="form-control"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>From Address</td>
+                            <td>
+                                <input type="text" th:field="*{fromAddress}" class="form-control"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Username</td>
+                            <td>
+                                <input type="text" th:field="*{username}" class="form-control"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Password</td>
+                            <td>
+                                <input type="password" th:field="*{password}" class="form-control"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Recipient</td>
+                            <td>
+                                <input type="text" th:field="*{recipient}" class="form-control"/>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
